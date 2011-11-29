@@ -41,7 +41,7 @@
          is_last_result/1,
          is_private_result/1,
          is_private_error/1,
-         is_result/1,
+         is_result/1, is_result/2,
          count_roster_items/2,
          roster_contains/2,
          is_privacy_query_result/1,
