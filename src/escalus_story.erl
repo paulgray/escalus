@@ -34,7 +34,6 @@ story(Config, ResourceCounts, Story) ->
     ClientDescs = clients_from_resource_counts(Config, ResourceCounts),
     try
         Clients = start_clients(Config, ClientDescs),
-        ensure_all_clean(Clients),
         apply(Story, Clients),
         post_story_checks(Config, Clients)
     after
@@ -113,11 +112,14 @@ ensure_all_clean(Clients) ->
 start_clients(Config, ClientDescs) ->
     case proplists:get_bool(everyone_is_friends, Config) of
         true ->
-            start_ready_clients(Config, lists:flatten(ClientDescs));
+            escalus_overridables:do(Config, start_ready_clients, [Config, lists:flatten(ClientDescs)],
+                                    {?MODULE, start_ready_clients});
         false ->
-            lists:flatmap(fun(UserCDs) ->
-                start_ready_clients(Config, UserCDs)
-            end, ClientDescs)
+            lists:flatmap(
+              fun(UserCDs) ->
+                      escalus_overridables:do(Config, start_ready_clients, [Config, UserCDs],
+                                              {?MODULE, start_ready_clients})
+                 end, ClientDescs)
     end.
 
 drop_presences(Client, N) ->
