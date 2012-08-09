@@ -21,7 +21,8 @@
          make_everyone_friends/1,
          make_everyone_friends/2,
          start_ready_clients/2,
-         send_initial_presence/1]).
+         send_initial_presence/1,
+         ensure_all_clean/1]).
 
 -include("escalus.hrl").
 -include_lib("test_server/include/test_server.hrl").
@@ -79,7 +80,8 @@ start_ready_clients(Config, FlatCDs) ->
         %% drop presence updates of guys who have logged in after you did
         drop_presences(Client, ClientsCount - N)
     end, 1, Clients),
-    ensure_all_clean(Clients),
+    escalus_overridables:do(Config, ensure_all_clean, [Clients],
+                            {?MODULE, ensure_all_clean}),
     Clients.
 
 send_initial_presence(Client) ->
